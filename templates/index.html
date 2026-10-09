@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم چت داخلی شرکت</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- صفحه ثبت نام/ورود -->
+    <div id="auth-page" class="auth-container">
+        <div class="auth-box">
+            <h1>سیستم چت داخلی</h1>
+            
+            <div id="register-form" class="form-container">
+                <button style="float:left;padding:10px;font-family:tahoma;font-size:medimu;border:0;background-color:Navy;color:white;" onclick="go_back();">بازگشت به هاب</button>
+                <input type="text" id="reg-firstname" placeholder="نام" required>
+                <input type="text" id="reg-lastname" placeholder="نام خانوادگی" required>
+                <input type="text" id="reg-position" placeholder="سمت" required>
+                <input type="text" id="reg-username" placeholder="نام کاربری" required>
+                <input type="password" id="reg-password" placeholder="رمز عبور" required>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="reg-manager">
+                    <span>مدیر هستم</span>
+                </label>
+                <button onclick="register()">ثبت نام</button>
+                <p class="switch-form">قبلاً ثبت نام کرده‌اید؟ <a href="#" onclick="showLogin()">ورود</a></p>
+            </div>
+            
+            <div id="login-form" class="form-container" style="display: none;">
+                <h2>ورود</h2>
+                <input type="text" id="login-username" placeholder="نام کاربری" required>
+                <input type="password" id="login-password" placeholder="رمز عبور" required>
+                <button onclick="login()">ورود</button>
+                <p class="switch-form">حساب کاربری ندارید؟ <a href="#" onclick="showRegister()">ثبت نام</a></p>
+            </div>
+            
+            <div id="auth-error" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- صفحه چت -->
+    <div id="chat-page" class="chat-container" style="display: none;">
+        <!-- هدر -->
+        <div class="chat-header">
+            <div class="user-info">
+                <span id="current-user-name"></span>
+                <span id="current-user-position"></span>
+            </div>
+            <button onclick="logout()" class="logout-btn">خروج</button>
+        </div>
+
+        <div class="chat-main">
+            <!-- ستون راست: لیست کاربران و اعلانات -->
+            <div class="sidebar">
+                <!-- جستجو -->
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="جستجو در پیام‌ها...">
+                    <div id="search-results" class="search-results"></div>
+                </div>
+
+                <!-- اعلانات -->
+                <div class="announcements-section">
+                    <h3>اعلانات</h3>
+                    <div id="announcement-input" style="display: none;">
+                        <textarea id="announcement-text" placeholder="اعلان جدید..."></textarea>
+                        <button onclick="sendAnnouncement()">ارسال اعلان</button>
+                    </div>
+                    <div id="announcements-list"></div>
+                </div>
+
+                <!-- لیست کاربران -->
+                <div class="users-section">
+                    <h3>همکاران</h3>
+                    <div id="users-list"></div>
+                </div>
+            </div>
+
+            <!-- کادر وسط: چت -->
+            <div class="chat-area">
+                <!-- تب‌ها -->
+                <div class="chat-tabs">
+                    <div class="tab active" data-chat="public" onclick="switchTab('public')">
+                        چت عمومی
+                    </div>
+                </div>
+
+                <!-- محتوای چت -->
+                <div class="chat-content">
+                    <div id="chat-public" class="chat-box active">
+                        <div class="messages" id="messages-public"></div>
+                        <div class="typing-indicator" id="typing-public"></div>
+                    </div>
+                </div>
+
+                <!-- نوار ابزار و ورودی -->
+                <div class="chat-input-area">
+                    <div class="toolbar">
+                        <button onclick="execCommand('bold')" title="Bold"><b>B</b></button>
+                        <button onclick="execCommand('italic')" title="Italic"><i>I</i></button>
+                        <button onclick="execCommand('underline')" title="Underline"><u>U</u></button>
+                        <select onchange="execCommand('fontName', this.value); this.selectedIndex=0;">
+                            <option value="">فونت</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Tahoma">Tahoma</option>
+                            <option value="Vazir">Vazir</option>
+                            <option value="IRANSans">IRANSans</option>
+                        </select>
+                        <input type="color" onchange="execCommand('foreColor', this.value)" title="رنگ متن">
+                        <button onclick="execCommand('justifyRight')" title="راست‌چین">→</button>
+                        <button onclick="execCommand('justifyLeft')" title="چپ‌چین">←</button>
+                        <button onclick="execCommand('justifyCenter')" title="وسط‌چین">↔</button>
+                        <button onclick="toggleEmojiPicker()" title="ایموجی">😊</button>
+                        <button onclick="document.getElementById('file-input').click()" title="آپلود فایل">📎</button>
+                        <input type="file" id="file-input" style="display: none;" onchange="uploadFile(this.files[0])">
+                    </div>
+                    
+                    <div class="emoji-picker" id="emoji-picker" style="display: none;"></div>
+                    
+                    <div class="input-row">
+                        <div contenteditable="true" id="message-input" class="message-input" placeholder="پیام خود را بنویسید..."></div>
+                        <button onclick="sendMessage()" class="send-btn">ارسال</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
